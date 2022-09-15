@@ -1,12 +1,14 @@
 package com.example.mobile
 
 import android.content.Intent
-import android.icu.util.Calendar
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.Menu
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import com.example.mobile.Network.CallAPIJD
 import com.example.mobile.Network.IServicesJD
 import com.example.mobile.helper.*
@@ -15,10 +17,6 @@ import com.example.mobile.model.User
 import com.example.mobile.model.UserRequest
 import kotlinx.android.synthetic.main.activity_main.*
 import org.json.JSONObject
-import java.sql.Date
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,20 +24,38 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        barLoad.visibility = View.VISIBLE
+        txtInfo.visibility = View.VISIBLE
         txtUser.Requerido(txtSUser)
         txtPass.Requerido(txtSPass)
         var userl = Config(this)
+        LoadInit(userl)
+        Eventos()
+    }
+
+    private fun LoadInit(userl: Config) {
         CallAPIJD.StartQuery(
 
-            "api/register2/${userl.getID()}",
-            CallAPIJD.Companion.method.GET,"",
+            "api/registerexists/${userl.getID()}",
+            CallAPIJD.Companion.method.GET, "",
             object : IServicesJD {
                 override fun Finish(response: String, status: Int) {
+
                     this@MainActivity.runOnUiThread {
+
                         if (status == HTTP.OK) {
-                            var user:User = JSONObject(userl.getUserLogin()).Cast()
-                            Toast.makeText(this@MainActivity,"welcome ${user.FirstName} ${user.LastName}",Toast.LENGTH_SHORT).show()
+                            var user: User = JSONObject(userl.getUserLogin()).toClass(User::class.java.name).Cast()
+                            Singleton.User = user
+                            try {
+                                Singleton.LoginHistory = JSONObject(response).toClass(LoginHistory::class.java.name).Cast()
+                            } catch (e: Exception) {
+                                Log.e("TAG", "Finish: Eror" )
+                            }
+                            Toast.makeText(
+                                this@MainActivity,
+                                "welcome ${user.FirstName} ${user.LastName}",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             startActivity(
                                 Intent(
                                     this@MainActivity,
@@ -49,11 +65,12 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                 }
-                override fun Error(response: String, status: Int) {
 
+                override fun Error(response: String, status: Int) {
+                  barLoad.isVisible = false
+                  txtInfo.isVisible = false
                 }
             })
-        Eventos()
     }
 
     private fun Eventos() {
@@ -88,6 +105,10 @@ class MainActivity : AppCompatActivity() {
                                             override fun Finish(response: String, status: Int) {
                                                 this@MainActivity.runOnUiThread {
                                                     if (status == HTTP.OK) {
+                                                        try {
+                                                            Singleton.LoginHistory = JSONObject(response).toClass(LoginHistory::class.java.name).Cast()
+                                                        } catch (e: Exception) {
+                                                        }
                                                         Toast.makeText(
                                                             this@MainActivity,
                                                             "welcome ${user.FirstName} ${user.LastName}",
@@ -139,4 +160,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
+
+
 }

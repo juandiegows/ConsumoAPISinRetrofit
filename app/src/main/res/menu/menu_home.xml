@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:icon="@drawable/logout"
+        android:id="@+id/itemExit"
+        android:icon="@drawable/ic_baseline_login_24"
         android:title="Exit"
         android:visible="true"
         app:showAsAction="always" />
