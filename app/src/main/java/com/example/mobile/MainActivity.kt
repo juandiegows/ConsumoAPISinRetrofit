@@ -67,8 +67,10 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 override fun Error(response: String, status: Int) {
-                  barLoad.isVisible = false
-                  txtInfo.isVisible = false
+                    this@MainActivity.runOnUiThread {
+                        barLoad.isVisible = false
+                        txtInfo.isVisible = false
+                    }
                 }
             })
     }

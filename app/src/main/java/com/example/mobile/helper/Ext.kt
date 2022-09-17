@@ -11,6 +11,9 @@ import com.google.android.material.textfield.TextInputLayout
 import org.json.JSONArray
 import org.json.JSONObject
 import java.lang.Exception
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.reflect.javaType
 import kotlin.reflect.typeOf
 
@@ -22,22 +25,33 @@ fun JSONObject.toClass(nameClass: String): Any {
 
     onClas.declaredFields.forEach {
         it.isAccessible = true
-        it.set(
-            instance, when (it.type) {
-                typeOf<Int>().javaType -> this.getInt(it.name)
-                typeOf<Double>().javaType -> this.getDouble(it.name)
-                typeOf<String>().javaType -> this.getString(it.name)
-                typeOf<Boolean>().javaType -> this.getBoolean(it.name)
-                typeOf<Long>().javaType -> this.getLong(it.name)
-                else -> {
-                    try {
-                        this.getJSONObject(it.name).toClass(it.type.name).Cast()
-                    } catch (e: Exception) {
+        try {
+            it.set(
+                instance, when (it.type) {
+                    typeOf<Int>().javaType -> this.getInt(it.name)
+                    typeOf<Double>().javaType -> this.getDouble(it.name)
+                    typeOf<String>().javaType -> this.getString(it.name)
+                    typeOf<Boolean>().javaType -> this.getBoolean(it.name)
+                    typeOf<Long>().javaType -> this.getLong(it.name)
+                    typeOf<Calendar?>().javaType -> {
+                        var date = Singleton.formatDate.parse(this@toClass.getString(it.name))
+                        Calendar.getInstance().apply {
+                            this.set(Calendar.YEAR, date.year)
+                            this.set(Calendar.MONTH,date.month)
+                            this.set(Calendar.DAY_OF_MONTH,date.date)
+                        }
+                    }
+                    else -> {
+                        try {
+                            this.getJSONObject(it.name).toClass(it.type.name).Cast()
+                        } catch (e: Exception) {
 
+                        }
                     }
                 }
-            }
-        )
+            )
+        } catch (e: Exception) {
+        }
     }
 
     return instance
