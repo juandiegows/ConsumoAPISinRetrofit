@@ -36,9 +36,7 @@ fun JSONObject.toClass(nameClass: String): Any {
                     typeOf<Calendar?>().javaType -> {
                         var date = Singleton.formatDate.parse(this@toClass.getString(it.name))
                         Calendar.getInstance().apply {
-                            this.set(Calendar.YEAR, date.year)
-                            this.set(Calendar.MONTH,date.month)
-                            this.set(Calendar.DAY_OF_MONTH,date.date)
+                            this.time = date
                         }
                     }
                     else -> {

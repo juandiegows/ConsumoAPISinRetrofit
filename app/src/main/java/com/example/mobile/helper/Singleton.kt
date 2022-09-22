@@ -8,5 +8,5 @@ object Singleton {
     var User:User = User()
     var Id:Int = 1
     var LoginHistory:LoginHistory =LoginHistory()
-    val formatDate = SimpleDateFormat("yyyy/MM/dd'T'HH:mm:ss")
+    val formatDate = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
 }
