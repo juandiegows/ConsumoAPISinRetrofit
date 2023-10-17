@@ -6,7 +6,7 @@ import android.content.SharedPreferences
 class Config(val context: Context) {
 
     val name = "Config"
-    val id = "IDS"
+    val id = "ID"
     val user = "user"
     fun getID(): Int {
         return context.getSharedPreferences(name, Context.MODE_PRIVATE).getInt(id, 0)
